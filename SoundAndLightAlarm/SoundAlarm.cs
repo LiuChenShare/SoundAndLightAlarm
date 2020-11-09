@@ -18,6 +18,8 @@ namespace SoundAndLightAlarm
         
         private static HttpListener httpPostRequest = new HttpListener();
 
+        private AlarmConfig alarmConfig;
+
         public SoundAlarm()
         {
             InitializeComponent();
@@ -52,13 +54,24 @@ namespace SoundAndLightAlarm
                 cboAlarmerComPort.Text = pts[pts.Length - 1];
             }
 
+            //从配置文件读取配置
+            alarmConfig = AlarmConfig.GetConfig();
+            if (!string.IsNullOrWhiteSpace(alarmConfig.ComPort)) { cboAlarmerComPort.Text = alarmConfig.ComPort; }
+            nudAlarmerSeconds.Value = alarmConfig.AlarmSeconds;
+            textBox2.Text = alarmConfig.Host;
 
-            httpPostRequest.Prefixes.Add("http://127.0.0.1:3213/");
-            httpPostRequest.Start();
+            try
+            {
+                httpPostRequest.Prefixes.Add(alarmConfig.Host);
+                httpPostRequest.Start();
 
-            Thread ThrednHttpPostRequest = new Thread(new ThreadStart(httpPostRequestHandle));
-            ThrednHttpPostRequest.Start();
-
+                Thread ThrednHttpPostRequest = new Thread(new ThreadStart(httpPostRequestHandle));
+                ThrednHttpPostRequest.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"服务启动异常: {ex.Message}");
+            }
         }
 
 
@@ -102,11 +115,12 @@ namespace SoundAndLightAlarm
                     request.Response.Headers.Add("Access-Control-Allow-Origin", "*");
                     request.Response.ContentType = "application/json";
                     requestContext.Response.ContentEncoding = Encoding.UTF8;
-                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes($"{{\"success\":{success.ToString().ToLower()}}}");
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(new { success }));
                     request.Response.ContentLength64 = buffer.Length;
                     var output = request.Response.OutputStream;
                     output.Write(buffer, 0, buffer.Length);
                     output.Close();
+
                     #region test
 
                     ////获取Post请求中的参数和值帮助类
@@ -332,11 +346,21 @@ namespace SoundAndLightAlarm
             return config;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        /// <summary> 保存参数 </summary>
+        private void button3_Click_1(object sender, EventArgs e)
         {
-            var aaa = textBox1.Text;
-
-            AlarmEventByStr(aaa);
+            alarmConfig.ComPort = cboAlarmerComPort.Text;
+            alarmConfig.AlarmSeconds = (int)nudAlarmerSeconds.Value;
+            alarmConfig.Host = textBox2.Text;
+            var result = AlarmConfig.SaveConfig(alarmConfig);
+            if (result.Item1)
+            {
+                MessageBox.Show("保存成功，若修改了服务地址，需重启生效");
+            }
+            else
+            {
+                MessageBox.Show($"保存失败：{result.Item2}");
+            }
         }
     }
 }
