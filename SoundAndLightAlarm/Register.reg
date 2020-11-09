@@ -1,0 +1,10 @@
+﻿Windows Registry Editor Version 5.00  
+[HKEY_CLASSES_ROOT\SoundAndLightAlarm]  
+"URL Protocol"="C:\\SoundAndLightAlarm\\SoundAndLightAlarm.exe"  
+@="SoundAndLightAlarm"  
+[HKEY_CLASSES_ROOT\SoundAndLightAlarm\DefaultIcon]  
+@="C:\\SoundAndLightAlarm\\SoundAndLightAlarm.exe,1"  
+[HKEY_CLASSES_ROOT\SoundAndLightAlarm\shell]  
+[HKEY_CLASSES_ROOT\SoundAndLightAlarm\shell\open]  
+[HKEY_CLASSES_ROOT\SoundAndLightAlarm\shell\open\command]  
+@="\"C:\\SoundAndLightAlarm\\SoundAndLightAlarm.exe\" \"%1\"" 

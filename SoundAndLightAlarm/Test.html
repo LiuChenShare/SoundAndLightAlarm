@@ -1,0 +1,27 @@
+﻿<a href="SoundAndLightAlarm://">播放报警</a>
+<br />
+
+<a href="SoundAndLightAlarm://open=0">关闭报警</a>
+<br />
+
+<a href="SoundAndLightAlarm://open=1&time=15">播放15秒报警</a>
+<br />
+
+<a href="http://127.0.0.1:3213/alarm">播放报警(web)</a>
+<br />
+
+<a href="http://127.0.0.1:3213/alarm?open=0">停止报警(web)</a>
+<br />
+
+<a href="http://127.0.0.1:3213/open=1&time=15">播放15秒报警(web)</a>
+<br />
+
+
+<script>
+    var int = self.setInterval("clock()", 20000);
+    function clock() {
+        var request = new XMLHttpRequest();
+        request.open("GET", "http://127.0.0.1:3213/alarm");
+        request.send(null);
+    }
+</script>
